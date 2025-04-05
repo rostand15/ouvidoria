@@ -61,6 +61,8 @@ def quantidade(conn):
 
 def listarportipo (conn):
      while True:
+        consultaListagemManifestacoes = 'select * from manifestacao'
+        manifestacoes = listarBancoDados(conn,consultaListagemManifestacoes)
         consultaListagemReclamacao = "select * from manifestacao where tipo = 'reclamação'"
         consultaListagemElogio = "select * from manifestacao where tipo = 'elogio'"
         consultaListagemSugestao = "select * from manifestacao where tipo = 'sugestão'"
@@ -71,19 +73,27 @@ def listarportipo (conn):
             reclamacoes = listarBancoDados(conn,consultaListagemReclamacao)
             for item in reclamacoes:
                 print(f"Manifestação: {item[3]} | Autor: {item[1]} | Tipo: {item[4]}")
+            if len(manifestacoes) ==0:
+                print("Não existem reclamações adicionadas!")
             break
 
         elif listarTipo == 2:
             elogios = listarBancoDados(conn,consultaListagemElogio)
             for item in elogios:
                 print(f"Manifestação: {item[3]} | Autor: {item[1]} | Tipo: {item[4]}")
+            if len(manifestacoes) ==0:
+                print("Não existem elogios adicionados!")
+        
             break
 
         elif listarTipo == 3:
             sugestoes = listarBancoDados(conn,consultaListagemSugestao)
             for item in sugestoes:
                 print(f"Manifestação: {item[3]} | Autor: {item[1]} | Tipo: {item[4]}")
+            if len(manifestacoes) ==0:
+                print("Não existem sugestões adicionadas!")
             break
+            
         else:
             print("Erro!, digite um número entre 1 e 3")
 
@@ -102,7 +112,7 @@ def buscarCodigo(conn):
 def removerManifestacao(conn):
     codigoManifestacao = int(input("Digite o código da Manifestação que deseja remover: "))
 
-    consultaRemover = "delete from manifestao where codigo = %s"
+    consultaRemover = "delete from manifestacao where codigo = %s"
     dados = [ codigoManifestacao ]
 
     linhasAlteradas = excluirBancoDados(conn,consultaRemover,dados)
