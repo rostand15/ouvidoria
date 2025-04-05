@@ -1,39 +1,45 @@
-from manifestmet import*
-from operacoesbd1 import*
+from manifestmet import *
+from operacoesbd1 import *
 
 manifestacao = []
 
-conn = criarConexao('localhost','root','linguicaqueimada','ouvidora')
-consultaListagemManifestacao = 'select * from manifestacao'
+conn = criarConexao('localhost','root','linguicaqueimada','ouvidoria')
+consultaListagemManifestacoes = 'select * from manifestacao'
+
+manifest = listarBancoDados(conn,consultaListagemManifestacoes)
 
 while True:
-    print("\nOpções: \n1)Lista de manifestções \n2)Adicionar manifestações \n3)Exibir quantidade de manifestações \n4)Pesquisar manifestação com codigo \n5)Sair do sistema \n")
+    print("\nOpções: \n1)Lista de manifestações " \
+    "\n2)Listagem de Manifestações por Tipo " \
+    "\n3)Criar uma nova Manifestação " \
+    "\n4)Exibir quantidade de manifestações " \
+    "\n5)Pesquisar uma manifestação por código " \
+    "\n6) Excluir uma Manifestação pelo Código " \
+    "\n7) Sair do Sistema.")
     opcao = int(input("Digite a opção desejada: "))
 
     if opcao == 1:
         listar(conn)
-    
-    elif opcao==2:
-        adicionar(conn)
-    
-    elif opcao==3:
-        if len(manifestacoes)>0:
-            print("A quantidade de manifestações na lista é de:", len(manifestacoes),"manifestações")
-        else:
-            print("Ainda não há manifestações na lista!")
 
-    elif opcao ==4:
-        pos = int(input("Digite o código da manifestação: "))
-        indice = pos-1
+    elif opcao == 2:
+        listarportipo(conn)
+        
+    elif opcao == 3:
+       adicionar(conn)
 
-        if indice >= 0 and indice < len(manifestacoes):
-            print("Manifestação:", manifestacoes[indice])
-        else:
-            print("Código inválido.")
+    elif opcao == 4:
+       quantidade(conn)
     
-    elif opcao ==5:
-        print("Sistema encerrado, agradecemos o acesso!.")
+    elif opcao == 5:
+        buscarCodigo(conn)
+    
+    elif opcao ==6:
+        removerManifestacao(conn)
+        
+    elif opcao == 7:
+        print("Saindo do sistema, agradecemos pelo acesso!")
         break
     
     else:
         print("Opção inválida")
+        

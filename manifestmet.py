@@ -1,49 +1,113 @@
 from operacoesbd1 import *
 
+conn = criarConexao('localhost','root','linguicaqueimada','ouvidoria')
+
+
 def listar(conn):
-    consultaListagemManifestacao = 'select * from manifestacao'
-    manifestaçoes = listarBancoDados(conn,consultaListagemManifestacao)
+    consultaListagemManifestacoes = 'select * from manifestacao'
+    manifestacoes = listarBancoDados(conn,consultaListagemManifestacoes)
 
-    if len(manifestaçoes) == 0:
-            print("nenhuma manifestação adicionada!")
+    if len(manifestacoes)==0:
+        print("Nenhuma manifestação adicionada!")
     else:
-        for item in manifestaçoes:
-            print(f"Manifestação:{item[1]} do autor {item[2]}")
+        for item in manifestacoes:
+            print(f"Manifestação: {item[3]} | Autor: {item[1]} | Tipo: {item[4]}")
 
-def adicionar (conn):
-     while True:
-        while True:
-            indice = input("\n1)Reclamação \n2)Elogio \n3)Sugestão \nEscolha o tipo da manifestação: ")
-            tipoManifestacao = ""
-            if indice == "1":
-                print("Você escolheu reclamação!")
-                tipoManifestacao == "Reclamação"
-                break
+def escolherTipo():
+    while True:
+        tipos = ["reclamação","elogio","sugestão"]
+        print('TIPOS DE MANIFESTACAO')
+        for index, tipo in enumerate(tipos):
+                print(f'{index+1}) {tipo}')
+        tipo = int(input("Digite o número do tipo da manifestação: "))
 
-            elif indice == "2":
-                print("Você escolheu elogio!")
-                tipoManifestacao == "Elogio"
-                break
-            
-            elif indice == "3":
-                print("Você escolheu sugestão!")
-                tipoManifestacao == "Sugestão"
-                break
-            else:
-                print("Digite novamente")
-             
-
-        novaManifestacao = input("Digite a nova manifestação que deseja adicionar: ")
-        if len(novaManifestacao) ==0:
-            print("ERRO!, digite novamente a manifestação desejada: ")
+        if tipo ==1:
+            return tipos[0]
+        elif tipo ==2:
+            return tipos[1]
+        elif tipo ==3:
+            return tipos[2]
         else:
-            print("Manifestação cadastrada com sucesso!")
+            print("Opção inválida. Escolha um número entre 1 e 3.")
+     
+
+def adicionar(conn):
+    while True:
+        nomeAutor = input("Digite o seu nome: ")
+        tipoFuncao = escolherTipo()
+        descricao = input("Digite a manifestação que deseja adicionar: ")
+
+        if len(descricao) ==0:
+                print("ERRO!, digite novamente a manifestação desejada: ")
+        
+        elif len(nomeAutor) ==0:
+             print("ERRO! Digite novamente o seu nome!")
+        else:
+             print("Manifestação adicionada com sucesso!")
+             break
+        
+
+    consultaInsert = "insert into manifestacao(autor,descricao,tipo) values(%s,%s,%s)"
+
+    dados = [ nomeAutor, descricao, tipoFuncao ] 
+
+    insertNoBancoDados(conn,consultaInsert,dados)
+
+def quantidade(conn):
+    consultaListagemManifestacoes = 'select count(*) from manifestacao'
+    resultado = listarBancoDados(conn,consultaListagemManifestacoes)
+    quantidadeManifestacao = resultado[0][0]
+    print("Temos",quantidadeManifestacao,"Manifestações")
+
+def listarportipo (conn):
+     while True:
+        consultaListagemReclamacao = "select * from manifestacao where tipo = 'reclamação'"
+        consultaListagemElogio = "select * from manifestacao where tipo = 'elogio'"
+        consultaListagemSugestao = "select * from manifestacao where tipo = 'sugestão'"
+
+        listarTipo = int(input("Escolha o tipo da manifestação que deseja listar: 1)Reclamação 2)Elogio 3)Sugestão. "))
+
+        if listarTipo == 1:
+            reclamacoes = listarBancoDados(conn,consultaListagemReclamacao)
+            for item in reclamacoes:
+                print(f"Manifestação: {item[3]} | Autor: {item[1]} | Tipo: {item[4]}")
             break
-        consultaInsert = "insert into manifestacao(descrição, tipo) values(%s,%s)"
 
-        dados = [novaManifestacao , indice] 
+        elif listarTipo == 2:
+            elogios = listarBancoDados(conn,consultaListagemElogio)
+            for item in elogios:
+                print(f"Manifestação: {item[3]} | Autor: {item[1]} | Tipo: {item[4]}")
+            break
 
-        insertNoBancoDados(conn,consultaInsert,dados)
-        print("Manifestação cadastrada com sucesso!")
-                      
-                
+        elif listarTipo == 3:
+            sugestoes = listarBancoDados(conn,consultaListagemSugestao)
+            for item in sugestoes:
+                print(f"Manifestação: {item[3]} | Autor: {item[1]} | Tipo: {item[4]}")
+            break
+        else:
+            print("Erro!, digite um número entre 1 e 3")
+
+def buscarCodigo(conn):
+    codigoManifestacao = int(input("Digite o código: "))
+    consultaPesquisaManifestacao = 'select * from manifestacao where codigo = %s'
+    dados = [ codigoManifestacao ]
+
+    manifestacao = listarBancoDados(conn,consultaPesquisaManifestacao,dados)
+
+    if len(manifestacao) == 0:
+        print("Não existem manifestações a serem exibidas")
+    else:
+        print("Manifestação encontrada: descrição:", manifestacao[0][3], "autor:", manifestacao[0][1], "tipo:", manifestacao[0][4])
+    
+def removerManifestacao(conn):
+    codigoManifestacao = int(input("Digite o código da Manifestação que deseja remover: "))
+
+    consultaRemover = "delete from manifestao where codigo = %s"
+    dados = [ codigoManifestacao ]
+
+    linhasAlteradas = excluirBancoDados(conn,consultaRemover,dados)
+
+    if linhasAlteradas == 0:
+        print("Não existe manifestação para o código informado")
+    else:
+        print("Manifestação removida com sucesso!")
